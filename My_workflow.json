@@ -1,0 +1,312 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -920,
+        -10
+      ],
+      "id": "7778cc02-3702-4318-aab0-588d55427ec4",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JLJJIfH1G5cPuu13",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "definicoes-do-personagem",
+              "description": "Frases que descrevem algo que aconteceu diretamente com um personagem jogador, como ações que ele executa, itens que ele adquire, mudanças em seu estado. Esses enunciados representam fatos, definições ou acontecimentos relevantes para a história individual do personagem. Exemplos:\n\"O velho homem lança uma maldição em Carl\",\n\"Maria achou uma maçã.\",\n\"João perdeu sua espada.\",\n\"Carl ganhou um colar do comerciante.\",\nNão inclui:  Descrições gerais do mundo (ex: \"o castelo está coberto de neblina\"), situações que não envolvem diretamente um personagem jogador (ex: \"um monstro ronda a floresta\")"
+            },
+            {
+              "category": "outros",
+              "description": "Categoria de fallback para qualquer texto que não se encaixe nas demais categorias relevantes. Pode incluir ambientações, interações genéricas, descrições ou conteúdos indefinidos."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        -260
+      ],
+      "id": "a2a887ea-fb88-463a-b681-6e9391abd806",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -392,
+        -40
+      ],
+      "id": "49e1d56a-1ca0-4918-9e0d-70873fadf42b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "0dTJOK4eGYA4P9k2",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b5c0e240-ede4-4649-9f5c-77b3c759fe94",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "speech",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -700,
+        -10
+      ],
+      "id": "20a3a325-74b2-4652-bc96-e0685d9d50a4",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -402,
+        140
+      ],
+      "id": "84b99c5d-4f50-404e-bd82-df500958d8a1",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -104,
+        -60
+      ],
+      "id": "a3b1f686-45d9-4fb3-9506-5af5596b1f94",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "tableName": "n8n-teste",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            },
+            {
+              "fieldId": "definition",
+              "fieldValue": "={{ $json.snippet }}"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -260
+      ],
+      "id": "41aaf29f-6bfb-4703-9966-16ad0769cd30",
+      "name": "AWS DynamoDB",
+      "credentials": {
+        "aws": {
+          "id": "6UyhzyPKGOzVJeDW",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "342b8c59-2789-4bf7-a155-586e08cba11c",
+              "name": "type",
+              "value": "user-items",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "snippet",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -104,
+        -260
+      ],
+      "id": "b2c4572e-b6c0-4733-abbc-c6111c49e016",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "id"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        116,
+        -260
+      ],
+      "id": "5675d288-c1f9-498a-80c5-251aa78f1c20",
+      "name": "Crypto"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing1": {
+      "main": [
+        []
+      ]
+    },
+    "AWS DynamoDB": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "AWS DynamoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "71f28071-a1df-4bec-a748-4f599ffeb13a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be10e3c40a4d7b858866ec734c9b9932cd5656ef6e06aac6005c17f2d28a50d5"
+  },
+  "id": "O2V7T60KhSoDk5RR",
+  "tags": []
+}
