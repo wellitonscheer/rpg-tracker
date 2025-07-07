@@ -15,21 +15,21 @@
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.2,
       "position": [
-        -920,
-        -10
+        -320,
+        440
       ],
-      "id": "7778cc02-3702-4318-aab0-588d55427ec4",
+      "id": "cc375969-091a-47ac-8b3d-9b72b3b43e11",
       "name": "Gmail Trigger",
       "credentials": {
         "gmailOAuth2": {
-          "id": "JLJJIfH1G5cPuu13",
+          "id": "QF1apfg89NNBqfig",
           "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
-        "inputText": "={{ $json.snippet }}",
+        "inputText": "={{ $json.body.message.speech }}",
         "categories": {
           "categories": [
             {
@@ -47,10 +47,10 @@
       "type": "@n8n/n8n-nodes-langchain.textClassifier",
       "typeVersion": 1.1,
       "position": [
-        -480,
-        -260
+        0,
+        0
       ],
-      "id": "a2a887ea-fb88-463a-b681-6e9391abd806",
+      "id": "039397a7-50c4-4362-bfab-fc0fe87d8c36",
       "name": "Text Classifier"
     },
     {
@@ -61,14 +61,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -392,
-        -40
+        20,
+        200
       ],
-      "id": "49e1d56a-1ca0-4918-9e0d-70873fadf42b",
+      "id": "f5cea62b-45d5-40b5-a266-27b30ce1629f",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
-          "id": "0dTJOK4eGYA4P9k2",
+          "id": "vgDKYjohordBfnRG",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -85,7 +85,7 @@
           "conditions": [
             {
               "id": "b5c0e240-ede4-4649-9f5c-77b3c759fe94",
-              "leftValue": "={{ $json.Subject }}",
+              "leftValue": "={{ $json.body.type }}",
               "rightValue": "speech",
               "operator": {
                 "type": "string",
@@ -100,10 +100,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -700,
-        -10
+        -220,
+        40
       ],
-      "id": "20a3a325-74b2-4652-bc96-e0685d9d50a4",
+      "id": "8f4ae8ed-4473-4ac1-916a-865c357d2100",
       "name": "If"
     },
     {
@@ -111,10 +111,10 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        -402,
-        140
+        80,
+        400
       ],
-      "id": "84b99c5d-4f50-404e-bd82-df500958d8a1",
+      "id": "d68d4862-9ad0-4d37-aa88-d794398d7898",
       "name": "No Operation, do nothing"
     },
     {
@@ -122,47 +122,11 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        -104,
-        -60
+        380,
+        200
       ],
-      "id": "a3b1f686-45d9-4fb3-9506-5af5596b1f94",
+      "id": "1b391cfd-70b1-4339-a180-c847e96ea38c",
       "name": "No Operation, do nothing1"
-    },
-    {
-      "parameters": {
-        "tableName": "n8n-teste",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "id",
-              "fieldValue": "={{ $json.id }}"
-            },
-            {
-              "fieldId": "type",
-              "fieldValue": "={{ $json.type }}"
-            },
-            {
-              "fieldId": "definition",
-              "fieldValue": "={{ $json.snippet }}"
-            }
-          ]
-        },
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.awsDynamoDb",
-      "typeVersion": 1,
-      "position": [
-        336,
-        -260
-      ],
-      "id": "41aaf29f-6bfb-4703-9966-16ad0769cd30",
-      "name": "AWS DynamoDB",
-      "credentials": {
-        "aws": {
-          "id": "6UyhzyPKGOzVJeDW",
-          "name": "AWS account"
-        }
-      }
     },
     {
       "parameters": {
@@ -178,16 +142,16 @@
         },
         "includeOtherFields": true,
         "include": "selected",
-        "includeFields": "snippet",
+        "includeFields": "body.message.speech, body.message.party",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -104,
-        -260
+        380,
+        0
       ],
-      "id": "b2c4572e-b6c0-4733-abbc-c6111c49e016",
+      "id": "1cf80abe-3bc6-4d08-a747-36a531a8be63",
       "name": "Edit Fields"
     },
     {
@@ -198,24 +162,74 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
-        116,
-        -260
+        600,
+        0
       ],
-      "id": "5675d288-c1f9-498a-80c5-251aa78f1c20",
+      "id": "c2d3a8dc-86e6-45d7-a83c-3de1f01e0826",
       "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f9969ca9-4bec-499a-94a5-c8bf796e3af5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        40
+      ],
+      "id": "35f1219c-9fb8-4af7-a4fe-0e5462482914",
+      "name": "Webhook",
+      "webhookId": "f9969ca9-4bec-499a-94a5-c8bf796e3af5"
+    },
+    {
+      "parameters": {
+        "tableName": "n8n-rpg-tracker",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            },
+            {
+              "fieldId": "definition",
+              "fieldValue": "={{ $json.speech }}"
+            },
+            {
+              "fieldId": "party",
+              "fieldValue": "={{ $json.party }}"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [
+        820,
+        0
+      ],
+      "id": "9256fc7a-d613-4774-806a-0ee456633c70",
+      "name": "Create or update an item",
+      "credentials": {
+        "aws": {
+          "id": "IFtn4XSp78lDaiDW",
+          "name": "AWS account"
+        }
+      }
     }
   ],
   "pinData": {},
   "connections": {
     "Gmail Trigger": {
       "main": [
-        [
-          {
-            "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Google Gemini Chat Model": {
@@ -265,16 +279,6 @@
         ]
       ]
     },
-    "No Operation, do nothing1": {
-      "main": [
-        []
-      ]
-    },
-    "AWS DynamoDB": {
-      "main": [
-        []
-      ]
-    },
     "Edit Fields": {
       "main": [
         [
@@ -290,7 +294,18 @@
       "main": [
         [
           {
-            "node": "AWS DynamoDB",
+            "node": "Create or update an item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -302,11 +317,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "71f28071-a1df-4bec-a748-4f599ffeb13a",
+  "versionId": "82cc2e44-c353-402c-acac-c7d44fbf113b",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "be10e3c40a4d7b858866ec734c9b9932cd5656ef6e06aac6005c17f2d28a50d5"
+    "instanceId": "141f5eea422eb2cf3815115e45f0feb26483c44b3215675972bf4daad3081449"
   },
-  "id": "O2V7T60KhSoDk5RR",
+  "id": "nNGwSG4lhKGTZzXq",
   "tags": []
 }

@@ -9,12 +9,13 @@ import (
 )
 
 type Message struct {
-	Speech string
+	Speech string `json:"speech"`
+	Party  string `json:"party"`
 }
 
 type RequestN8NWebhook struct {
-	Type    string
-	Message Message
+	Type    string  `json:"type"`
+	Message Message `json:"message"`
 }
 
 type N8NWebhookResponse struct {
@@ -27,7 +28,8 @@ func main() {
 	n8nRequest := RequestN8NWebhook{
 		Type: "speech",
 		Message: Message{
-			Speech: "caio recebe uma maça do mago",
+			Party:  "au-treck-is-my",
+			Speech: "caio recebe uma maca do mago",
 		},
 	}
 
