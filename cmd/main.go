@@ -29,7 +29,7 @@ func main() {
 		Type: "speech",
 		Message: Message{
 			Party:  "au-treck-is-my",
-			Speech: "caio recebe uma maca do mago",
+			Speech: "voces estao em uma floresta escura com arvores com grandes cachopas que cobrem o sol e com varios cipós que caem de entre meio as folhas",
 		},
 	}
 

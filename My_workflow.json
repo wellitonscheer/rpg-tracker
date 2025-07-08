@@ -37,12 +37,14 @@
               "description": "Frases que descrevem algo que aconteceu diretamente com um personagem jogador, como ações que ele executa, itens que ele adquire, mudanças em seu estado. Esses enunciados representam fatos, definições ou acontecimentos relevantes para a história individual do personagem. Exemplos:\n\"O velho homem lança uma maldição em Carl\",\n\"Maria achou uma maçã.\",\n\"João perdeu sua espada.\",\n\"Carl ganhou um colar do comerciante.\",\nNão inclui:  Descrições gerais do mundo (ex: \"o castelo está coberto de neblina\"), situações que não envolvem diretamente um personagem jogador (ex: \"um monstro ronda a floresta\")"
             },
             {
-              "category": "outros",
-              "description": "Categoria de fallback para qualquer texto que não se encaixe nas demais categorias relevantes. Pode incluir ambientações, interações genéricas, descrições ou conteúdos indefinidos."
+              "category": "descricao-cenario",
+              "description": "Textos que apresentam ou detalham o ambiente onde a ação ocorre. Incluem informações visuais, sensoriais ou geográficas sobre o local, clima, objetos no entorno, atmosfera e qualquer outro elemento que componha o cenário. Não descrevem ações ou estados dos personagens diretamente, apenas o espaço ao redor.  Exemplos:  \"A floresta é densa e silenciosa, com névoa entre as árvores.\"  \"Uma taverna acanhada com cheiro de cerveja velha e madeira queimada.\"  \"O céu está nublado e trovões ressoam ao longe.\"  \"Há uma ponte quebrada atravessando o rio caudaloso.\"  Não inclui:  Ações ou decisões dos personagens  Mudanças de estado ou eventos que afetam diretamente os jogadores  Fatos ou falas atribuídas aos personagens"
             }
           ]
         },
-        "options": {}
+        "options": {
+          "fallback": "other"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.textClassifier",
       "typeVersion": 1.1,
@@ -122,8 +124,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        380,
-        200
+        340,
+        220
       ],
       "id": "1b391cfd-70b1-4339-a180-c847e96ea38c",
       "name": "No Operation, do nothing1"
@@ -148,8 +150,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        380,
-        0
+        400,
+        -140
       ],
       "id": "1cf80abe-3bc6-4d08-a747-36a531a8be63",
       "name": "Edit Fields"
@@ -162,8 +164,8 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
-        600,
-        0
+        680,
+        -20
       ],
       "id": "c2d3a8dc-86e6-45d7-a83c-3de1f01e0826",
       "name": "Crypto"
@@ -212,11 +214,114 @@
       "type": "n8n-nodes-base.awsDynamoDb",
       "typeVersion": 1,
       "position": [
-        820,
-        0
+        860,
+        -20
       ],
       "id": "9256fc7a-d613-4774-806a-0ee456633c70",
       "name": "Create or update an item",
+      "credentials": {
+        "aws": {
+          "id": "IFtn4XSp78lDaiDW",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "342b8c59-2789-4bf7-a155-586e08cba11c",
+              "name": "type",
+              "value": "view-description",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "body.message.speech, body.message.party",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        60
+      ],
+      "id": "b0a7e50b-46fb-4211-acda-cbb9d319a605",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyBfWRO4mcreYBklfk8mKW2ed_urcH9wEgc"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"contents\": [{\n      \"parts\": [\n        {\"text\": \"Generate a realistic and highly detailed image based on the following description from a Dungeons & Dragons (D&D) roleplaying game. The scene is fictional, part of a fantasy world. Focus on capturing the atmosphere and mood the description evokes, using appropriate lighting, color, and fantasy elements. Although nothing in this world is real, the image should feel immersive and believable. Scene Description: {{ $json.speech }}\" }\n      ]\n    }],\n    \"generationConfig\": {\"responseModalities\": [\"Text\", \"Image\"]}\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        220
+      ],
+      "id": "7e843cdb-8e6f-4dc6-9c5b-a0be36c7085a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "information",
+        "dataPropertyName": "={{ $json.candidates[0].content.parts[1].inlineData.data }}"
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        140
+      ],
+      "id": "8c24e67c-3c00-4c90-8af8-91ee6598066d",
+      "name": "Edit Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "const base64Image = $input.first().json.candidates[0].content.parts[1].inlineData.data;\n    const decodedImage = Buffer.from(base64Image, 'base64');\n    \n    const items = {\n      image: {\n        data: decodedImage,\n        type: 'image/png', // Or the correct MIME type\n        filename: 'decoded_image.png' // Or a dynamic filename\n      }\n    };\n    \n    return items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        240
+      ],
+      "id": "aed71ec6-09b4-4e57-8fae-3beab46815d6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "n8n-rpg-tracker",
+        "fileName": "test/heehe/image.png",
+        "binaryPropertyName": "={{ $json.candidates[0].content.parts[1].inlineData.data }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        360
+      ],
+      "id": "2e098ddf-71e2-40d8-868d-c2844df5a939",
+      "name": "Upload a file",
       "credentials": {
         "aws": {
           "id": "IFtn4XSp78lDaiDW",
@@ -248,6 +353,13 @@
         [
           {
             "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
             "type": "main",
             "index": 0
           }
@@ -311,13 +423,51 @@
           }
         ]
       ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "82cc2e44-c353-402c-acac-c7d44fbf113b",
+  "versionId": "7614b41d-a988-440c-96e9-03927ed63ed9",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "141f5eea422eb2cf3815115e45f0feb26483c44b3215675972bf4daad3081449"
