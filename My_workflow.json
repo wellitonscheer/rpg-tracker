@@ -3,32 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "pollTimes": {
-          "item": [
-            {
-              "mode": "everyMinute"
-            }
-          ]
-        },
-        "filters": {}
-      },
-      "type": "n8n-nodes-base.gmailTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        -320,
-        440
-      ],
-      "id": "cc375969-091a-47ac-8b3d-9b72b3b43e11",
-      "name": "Gmail Trigger",
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "QF1apfg89NNBqfig",
-          "name": "Gmail account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "inputText": "={{ $json.body.message.speech }}",
         "categories": {
           "categories": [
@@ -267,7 +241,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n    \"contents\": [{\n      \"parts\": [\n        {\"text\": \"Generate a realistic and highly detailed image based on the following description from a Dungeons & Dragons (D&D) roleplaying game. The scene is fictional, part of a fantasy world. Focus on capturing the atmosphere and mood the description evokes, using appropriate lighting, color, and fantasy elements. Although nothing in this world is real, the image should feel immersive and believable. Scene Description: {{ $json.speech }}\" }\n      ]\n    }],\n    \"generationConfig\": {\"responseModalities\": [\"Text\", \"Image\"]}\n  }",
+        "jsonBody": "={\n    \"contents\": [{\n      \"parts\": [\n        {\"text\": \"Gere uma imagem realista e altamente detalhada com base na descrição a seguir, retirada de uma campanha de RPG no universo de Dungeons & Dragons. A cena é completamente fictícia, parte de um mundo de fantasia. A imagem deve refletir fielmente todos os elementos descritos, incluindo objetos, cores, luzes, clima, arquitetura, criaturas, e quaisquer outros detalhes visuais citados. Use composição, iluminação e ambientação para transmitir o clima emocional da cena (como tensão, mistério, paz ou perigo). Mesmo sendo uma fantasia, a imagem deve parecer crível e imersiva, como se fosse uma fotografia de um mundo fantástico. Descrição da Cena: {{ $json.speech }} Instruções para a IA: Reproduza todos os elementos descritos com precisão, sem omissões. Dê atenção especial à atmosfera e ao tom sugerido pela descrição. Use estética de fantasia medieval (como castelos, florestas mágicas, criaturas místicas etc.), mas com renderização realista. Se houver personagens, retrate-os com roupas e equipamentos condizentes com o universo de D&D.\" }\n      ]\n    }],\n    \"generationConfig\": {\"responseModalities\": [\"Text\", \"Image\"]}\n  }",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -295,7 +269,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base64Image = $input.first().json.candidates[0].content.parts[1].inlineData.data;\n    const decodedImage = Buffer.from(base64Image, 'base64');\n    \n    const items = {\n      image: {\n        data: decodedImage,\n        type: 'image/png', // Or the correct MIME type\n        filename: 'decoded_image.png' // Or a dynamic filename\n      }\n    };\n    \n    return items;"
+        "jsCode": "const base64Image = $input.first().json.candidates[0].content.parts[1].inlineData.data;\n    const decodedImage = Buffer.from(base64Image, 'base64');\n    \n    items[0].binary = {\n     data: {\n       data: decodedImage\n     }\n    };\n    \n    return items;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -310,15 +284,14 @@
       "parameters": {
         "operation": "upload",
         "bucketName": "n8n-rpg-tracker",
-        "fileName": "test/heehe/image.png",
-        "binaryPropertyName": "={{ $json.candidates[0].content.parts[1].inlineData.data }}",
+        "fileName": "={{ $('HTTP Request').item.json.responseId }}.png",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.awsS3",
       "typeVersion": 2,
       "position": [
-        1100,
-        360
+        1040,
+        340
       ],
       "id": "2e098ddf-71e2-40d8-868d-c2844df5a939",
       "name": "Upload a file",
@@ -328,15 +301,21 @@
           "name": "AWS account"
         }
       }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        380
+      ],
+      "id": "d6e821d6-fa6d-4e04-a3e2-ef4c6b4e5ddf",
+      "name": "When clicking ‘Execute workflow’"
     }
   ],
   "pinData": {},
   "connections": {
-    "Gmail Trigger": {
-      "main": [
-        []
-      ]
-    },
     "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
@@ -461,13 +440,18 @@
           }
         ]
       ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "7614b41d-a988-440c-96e9-03927ed63ed9",
+  "versionId": "439469a8-e08b-43aa-94e7-040bd13bcdcb",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "141f5eea422eb2cf3815115e45f0feb26483c44b3215675972bf4daad3081449"
