@@ -29,7 +29,7 @@ func main() {
 		Type: "speech",
 		Message: Message{
 			Party:  "au-treck-is-my",
-			Speech: "era vilarejo proxima a uma taverna onde se reunia um grupo de goblins",
+			Speech: "uma pequena vila oriental da idade media, com uma feira acontecendo, algumas pessoas que estao comprando na feira estao olhando assustados na direcao de voces",
 		},
 	}
 
@@ -39,7 +39,7 @@ func main() {
 		fmt.Printf("error to marshal n8nRequest: %v", err)
 	}
 
-	res, err := http.Post("http://localhost:5678/webhook/f9969ca9-4bec-499a-94a5-c8bf796e3af5", "application/json", &n8nRequestBuff)
+	res, err := http.Post("http://localhost:5678/webhook-test/f9969ca9-4bec-499a-94a5-c8bf796e3af5", "application/json", &n8nRequestBuff)
 	if err != nil {
 		fmt.Printf("error to call webhook: %s", err.Error())
 	}
