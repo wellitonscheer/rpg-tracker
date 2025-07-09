@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Message struct {
@@ -24,7 +27,62 @@ type N8NWebhookResponse struct {
 	Hint    string
 }
 
+type N8NEnvVars struct {
+	WebhookUrl     string
+	webhookTestUrl string
+}
+
+type GeneralEnvVars struct {
+	Env string
+}
+
+type Config struct {
+	N8NEnvVars     N8NEnvVars
+	GeneralEnvVars GeneralEnvVars
+}
+
+// get the right webhook url depending on the enviroment
+func (c *Config) n8nUrlToUse() string {
+	if c.GeneralEnvVars.Env == "test" {
+		return c.N8NEnvVars.webhookTestUrl
+	}
+
+	return c.N8NEnvVars.WebhookUrl
+}
+
+func getValidEnv(key string) string {
+	envValue := os.Getenv(key)
+	if envValue == "" {
+		panic(fmt.Sprintf("empty env var: %s", key))
+	}
+
+	return envValue
+}
+
+func getEnvsVariables() *Config {
+	n8nVars := N8NEnvVars{
+		WebhookUrl:     getValidEnv("N8N_WEBHOOK_URL"),
+		webhookTestUrl: getValidEnv("N8N_WEBHOOK_TEST_URL"),
+	}
+
+	generalVars := GeneralEnvVars{
+		Env: getValidEnv("ENV"),
+	}
+
+	return &Config{
+		N8NEnvVars:     n8nVars,
+		GeneralEnvVars: generalVars,
+	}
+}
+
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic("failed to load env variables")
+	}
+
+	config := getEnvsVariables()
+
 	n8nRequest := RequestN8NWebhook{
 		Type: "speech",
 		Message: Message{
@@ -34,12 +92,12 @@ func main() {
 	}
 
 	var n8nRequestBuff bytes.Buffer
-	err := json.NewEncoder(&n8nRequestBuff).Encode(n8nRequest)
+	err = json.NewEncoder(&n8nRequestBuff).Encode(n8nRequest)
 	if err != nil {
 		fmt.Printf("error to marshal n8nRequest: %v", err)
 	}
 
-	res, err := http.Post("http://localhost:5678/webhook-test/f9969ca9-4bec-499a-94a5-c8bf796e3af5", "application/json", &n8nRequestBuff)
+	res, err := http.Post(config.n8nUrlToUse(), "application/json", &n8nRequestBuff)
 	if err != nil {
 		fmt.Printf("error to call webhook: %s", err.Error())
 	}
