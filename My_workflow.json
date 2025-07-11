@@ -3,33 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "pollTimes": {
-          "item": [
-            {
-              "mode": "everyMinute"
-            }
-          ]
-        },
-        "filters": {}
-      },
-      "type": "n8n-nodes-base.gmailTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        -920,
-        -10
-      ],
-      "id": "7778cc02-3702-4318-aab0-588d55427ec4",
-      "name": "Gmail Trigger",
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "JLJJIfH1G5cPuu13",
-          "name": "Gmail account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "inputText": "={{ $json.snippet }}",
+        "inputText": "={{ $json.body.message.speech }}",
         "categories": {
           "categories": [
             {
@@ -37,20 +11,22 @@
               "description": "Frases que descrevem algo que aconteceu diretamente com um personagem jogador, como ações que ele executa, itens que ele adquire, mudanças em seu estado. Esses enunciados representam fatos, definições ou acontecimentos relevantes para a história individual do personagem. Exemplos:\n\"O velho homem lança uma maldição em Carl\",\n\"Maria achou uma maçã.\",\n\"João perdeu sua espada.\",\n\"Carl ganhou um colar do comerciante.\",\nNão inclui:  Descrições gerais do mundo (ex: \"o castelo está coberto de neblina\"), situações que não envolvem diretamente um personagem jogador (ex: \"um monstro ronda a floresta\")"
             },
             {
-              "category": "outros",
-              "description": "Categoria de fallback para qualquer texto que não se encaixe nas demais categorias relevantes. Pode incluir ambientações, interações genéricas, descrições ou conteúdos indefinidos."
+              "category": "descricao-cenario",
+              "description": "Textos que apresentam ou detalham o ambiente onde a ação ocorre. Incluem informações visuais, sensoriais ou geográficas sobre o local, clima, objetos no entorno, atmosfera e qualquer outro elemento que componha o cenário. Não descrevem ações ou estados dos personagens diretamente, apenas o espaço ao redor.  Exemplos:  \"A floresta é densa e silenciosa, com névoa entre as árvores.\"  \"Uma taverna acanhada com cheiro de cerveja velha e madeira queimada.\"  \"O céu está nublado e trovões ressoam ao longe.\"  \"Há uma ponte quebrada atravessando o rio caudaloso.\"  Não inclui:  Ações ou decisões dos personagens  Mudanças de estado ou eventos que afetam diretamente os jogadores  Fatos ou falas atribuídas aos personagens"
             }
           ]
         },
-        "options": {}
+        "options": {
+          "fallback": "other"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.textClassifier",
       "typeVersion": 1.1,
       "position": [
-        -480,
-        -260
+        0,
+        -40
       ],
-      "id": "a2a887ea-fb88-463a-b681-6e9391abd806",
+      "id": "039397a7-50c4-4362-bfab-fc0fe87d8c36",
       "name": "Text Classifier"
     },
     {
@@ -61,14 +37,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -392,
-        -40
+        88,
+        180
       ],
-      "id": "49e1d56a-1ca0-4918-9e0d-70873fadf42b",
+      "id": "f5cea62b-45d5-40b5-a266-27b30ce1629f",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
-          "id": "0dTJOK4eGYA4P9k2",
+          "id": "vgDKYjohordBfnRG",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -85,7 +61,7 @@
           "conditions": [
             {
               "id": "b5c0e240-ede4-4649-9f5c-77b3c759fe94",
-              "leftValue": "={{ $json.Subject }}",
+              "leftValue": "={{ $json.body.type }}",
               "rightValue": "speech",
               "operator": {
                 "type": "string",
@@ -100,10 +76,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -700,
-        -10
+        -220,
+        260
       ],
-      "id": "20a3a325-74b2-4652-bc96-e0685d9d50a4",
+      "id": "8f4ae8ed-4473-4ac1-916a-865c357d2100",
       "name": "If"
     },
     {
@@ -111,10 +87,10 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        -402,
-        140
+        78,
+        360
       ],
-      "id": "84b99c5d-4f50-404e-bd82-df500958d8a1",
+      "id": "d68d4862-9ad0-4d37-aa88-d794398d7898",
       "name": "No Operation, do nothing"
     },
     {
@@ -122,47 +98,11 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        -104,
-        -60
+        376,
+        310
       ],
-      "id": "a3b1f686-45d9-4fb3-9506-5af5596b1f94",
+      "id": "1b391cfd-70b1-4339-a180-c847e96ea38c",
       "name": "No Operation, do nothing1"
-    },
-    {
-      "parameters": {
-        "tableName": "n8n-teste",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "id",
-              "fieldValue": "={{ $json.id }}"
-            },
-            {
-              "fieldId": "type",
-              "fieldValue": "={{ $json.type }}"
-            },
-            {
-              "fieldId": "definition",
-              "fieldValue": "={{ $json.snippet }}"
-            }
-          ]
-        },
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.awsDynamoDb",
-      "typeVersion": 1,
-      "position": [
-        336,
-        -260
-      ],
-      "id": "41aaf29f-6bfb-4703-9966-16ad0769cd30",
-      "name": "AWS DynamoDB",
-      "credentials": {
-        "aws": {
-          "id": "6UyhzyPKGOzVJeDW",
-          "name": "AWS account"
-        }
-      }
     },
     {
       "parameters": {
@@ -178,16 +118,16 @@
         },
         "includeOtherFields": true,
         "include": "selected",
-        "includeFields": "snippet",
+        "includeFields": "body.message.speech, body.message.party",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -104,
-        -260
+        376,
+        -140
       ],
-      "id": "b2c4572e-b6c0-4733-abbc-c6111c49e016",
+      "id": "1cf80abe-3bc6-4d08-a747-36a531a8be63",
       "name": "Edit Fields"
     },
     {
@@ -198,26 +138,170 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
-        116,
-        -260
+        596,
+        -90
       ],
-      "id": "5675d288-c1f9-498a-80c5-251aa78f1c20",
+      "id": "c2d3a8dc-86e6-45d7-a83c-3de1f01e0826",
       "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f9969ca9-4bec-499a-94a5-c8bf796e3af5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        260
+      ],
+      "id": "35f1219c-9fb8-4af7-a4fe-0e5462482914",
+      "name": "Webhook",
+      "webhookId": "f9969ca9-4bec-499a-94a5-c8bf796e3af5"
+    },
+    {
+      "parameters": {
+        "tableName": "n8n-rpg-tracker",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "type",
+              "fieldValue": "={{ $json.type }}"
+            },
+            {
+              "fieldId": "definition",
+              "fieldValue": "={{ $json.speech }}"
+            },
+            {
+              "fieldId": "party",
+              "fieldValue": "={{ $json.party }}"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -90
+      ],
+      "id": "9256fc7a-d613-4774-806a-0ee456633c70",
+      "name": "Create or update an item",
+      "credentials": {
+        "aws": {
+          "id": "IFtn4XSp78lDaiDW",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "342b8c59-2789-4bf7-a155-586e08cba11c",
+              "name": "type",
+              "value": "view-description",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "body.message.speech, body.message.party",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        376,
+        110
+      ],
+      "id": "b0a7e50b-46fb-4211-acda-cbb9d319a605",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env['GOOGLE_GEMINI_API_KEY'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"contents\": [{\n      \"parts\": [\n        {\"text\": \"Gere uma imagem 16:9 altamente realista e rica em detalhes com base na descrição a seguir. A imagem deve parecer uma fotografia realista. Reproduza fielmente todos os elementos descritos, incluindo arquitetura, personagens, clima, luz, vestimentas, objetos e atmosfera. Use iluminação cinematográfica e estética realista, evitando qualquer estilo de ilustração de jogos ou desenhos. Não pode aparecer texto ou legenda na imagem. Descrição da cena: '{{ $json.speech }}'\" }\n      ]\n    }],\n    \"generationConfig\": {\"responseModalities\": [\"Text\", \"Image\"]}\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        596,
+        160
+      ],
+      "id": "7e843cdb-8e6f-4dc6-9c5b-a0be36c7085a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const base64Image = $input.first().json.candidates[0].content.parts[1].inlineData.data;\n    const decodedImage = Buffer.from(base64Image, 'base64');\n    \n    items[0].binary = {\n     data: {\n       data: decodedImage\n     }\n    };\n    \n    return items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        160
+      ],
+      "id": "aed71ec6-09b4-4e57-8fae-3beab46815d6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "n8n-rpg-tracker",
+        "fileName": "={{ $('HTTP Request').item.json.responseId }}.png",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        1036,
+        160
+      ],
+      "id": "2e098ddf-71e2-40d8-868d-c2844df5a939",
+      "name": "Upload a file",
+      "credentials": {
+        "aws": {
+          "id": "IFtn4XSp78lDaiDW",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        620
+      ],
+      "id": "d6e821d6-fa6d-4e04-a3e2-ef4c6b4e5ddf",
+      "name": "When clicking ‘Execute workflow’"
     }
   ],
   "pinData": {},
   "connections": {
-    "Gmail Trigger": {
-      "main": [
-        [
-          {
-            "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
@@ -234,6 +318,13 @@
         [
           {
             "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
             "type": "main",
             "index": 0
           }
@@ -265,16 +356,6 @@
         ]
       ]
     },
-    "No Operation, do nothing1": {
-      "main": [
-        []
-      ]
-    },
-    "AWS DynamoDB": {
-      "main": [
-        []
-      ]
-    },
     "Edit Fields": {
       "main": [
         [
@@ -290,23 +371,77 @@
       "main": [
         [
           {
-            "node": "AWS DynamoDB",
+            "node": "Create or update an item",
             "type": "main",
             "index": 0
           }
         ]
       ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "71f28071-a1df-4bec-a748-4f599ffeb13a",
+  "versionId": "54229483-18e8-441c-8ac7-44c46f8c57a1",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "be10e3c40a4d7b858866ec734c9b9932cd5656ef6e06aac6005c17f2d28a50d5"
+    "instanceId": "141f5eea422eb2cf3815115e45f0feb26483c44b3215675972bf4daad3081449"
   },
-  "id": "O2V7T60KhSoDk5RR",
+  "id": "nNGwSG4lhKGTZzXq",
   "tags": []
 }

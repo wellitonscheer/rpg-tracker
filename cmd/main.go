@@ -82,12 +82,11 @@ func main() {
 	}
 
 	config := getEnvsVariables()
-	aa
 	n8nRequest := RequestN8NWebhook{
 		Type: "speech",
 		Message: Message{
 			Party:  "au-treck-is-my",
-			Speech: "",
+			Speech: "uma pequena vila oriental da idade media, com uma feira acontecendo, algumas pessoas que estao comprando na feira estao olhando assustados na direcao de voces",
 		},
 	}
 
