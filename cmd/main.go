@@ -82,7 +82,6 @@ func main() {
 	}
 
 	config := getEnvsVariables()
-
 	n8nRequest := RequestN8NWebhook{
 		Type: "speech",
 		Message: Message{

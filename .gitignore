@@ -4,3 +4,7 @@ client_secret*
 
 Code.json
 HTTP_Request.json
+
+stt/models/*
+
+*.log
